@@ -12,13 +12,8 @@ class Dataset:
         sstubs = []
 
         for obj in json_objects:
-            project_name = obj['projectName']
-            file_path = obj['bugFilePath']
-            commit_sha = obj['fixCommitSHA1']
-            source_before = obj['sourceBeforeFix']
-            source_after = obj['sourceAfterFix']
-
-            sstub = SStub(project_name, file_path, commit_sha, source_before, source_after)
+            sstub = SStub(obj['projectName'], obj['bugFilePath'], obj['sourceBeforeFix'],
+                          obj['sourceAfterFix'], obj['fixCommitSHA1'])
             sstubs.append(sstub)
 
         dataset.close()
@@ -29,6 +24,6 @@ class Dataset:
         sstubs = self.get_sstubs()
 
         for sstub in sstubs:
-            project_names.add(sstub.get_project_name())
+            project_names.add(sstub.project_name)
 
         return project_names
