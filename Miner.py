@@ -1,7 +1,7 @@
 from github import Github
 import BuildMiner
 import DateMiner
-from dataset import Dataset
+from Dataset import Dataset
 
 
 def mine(path, token):

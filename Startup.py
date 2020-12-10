@@ -3,7 +3,7 @@ import sys
 import Miner
 
 
-# Checks if the user passed 3 arguments (the startup.py file, the dataset path, and their GitHub access token).
+# Checks if the user passed 3 arguments (the Startup.py file, the dataset path, and their GitHub access token).
 def validate_args(args):
     if len(args) == 3:
         return True
@@ -35,7 +35,7 @@ def validate_token(token):
 def main():
     if not validate_args(sys.argv):
         print("The path to the dataset and your personal access token must be passed as arguments:\n"
-              "'python startup.py <path> <token>'")
+              "'python Startup.py <path> <token>'")
         return
 
     path = sys.argv[1]

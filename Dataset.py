@@ -1,5 +1,5 @@
 import json
-from sstub import SStub
+from SStub import SStub
 
 
 class Dataset:
