@@ -62,3 +62,7 @@ class SStub:
     @build_system.setter
     def build_system(self, build_system):
         self._build_system = build_system
+
+    @property
+    def time_difference(self):
+        return self.fix_time - self.bug_time
