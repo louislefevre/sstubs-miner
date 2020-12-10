@@ -8,6 +8,7 @@ class SStub:
         self._bug_sha = None
         self._fix_time = None
         self._bug_time = None
+        self._build_system = None
 
     @property
     def project_name(self):
@@ -53,3 +54,11 @@ class SStub:
     @bug_time.setter
     def bug_time(self, time):
         self._bug_time = time
+
+    @property
+    def build_system(self):
+        return self._build_system
+
+    @build_system.setter
+    def build_system(self, build_system):
+        self._build_system = build_system

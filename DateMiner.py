@@ -1,10 +1,4 @@
-from github import Github
-from dataset import Dataset
-
-
-def mine_repos(sstubs):
-    github = Github()
-
+def mine(github, sstubs):
     for sstub in sstubs:
         repo = github.get_repo(sstub.project_name)
         fix_commit = repo.get_commit(sha=sstub.fix_sha)
@@ -27,7 +21,3 @@ def mine_repos(sstubs):
             else:
                 continue
             break
-
-
-dataset = Dataset('sstubsLarge-0104.json')
-mine_repos(dataset.get_sstubs())

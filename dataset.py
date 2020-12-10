@@ -18,12 +18,3 @@ class Dataset:
 
         dataset.close()
         return sstubs
-
-    def get_project_names(self):
-        project_names = set()
-        sstubs = self.get_sstubs()
-
-        for sstub in sstubs:
-            project_names.add(sstub.project_name)
-
-        return project_names
