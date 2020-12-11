@@ -65,11 +65,13 @@ def print_results(builds, project_names):
     print('{} projects had another or no build system.'.format(total_projects-total_builds))
 
 
-def mine(github, sstubs):
+def mine(github, data_saver, sstubs):
     build_names = load_builds('builds.txt')
     project_names = load_names(sstubs)
 
     mine_repos(github, project_names, build_names)
     add_builds(sstubs, project_names)
+
+    data_saver.write_dictionary(build_names)
 
     print_results(build_names, project_names)
