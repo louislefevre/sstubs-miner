@@ -1,4 +1,4 @@
-import json
+from JsonManager import JsonReader
 from SStub import SStub
 
 
@@ -7,8 +7,8 @@ class Dataset:
         self._path = path
 
     def get_sstubs(self):
-        dataset = open(self._path)
-        json_objects = json.load(dataset)
+        reader = JsonReader(self._path)
+        json_objects = reader.read()
         sstubs = []
 
         for obj in json_objects:
@@ -16,5 +16,5 @@ class Dataset:
                           obj['sourceAfterFix'], obj['fixCommitSHA1'])
             sstubs.append(sstub)
 
-        dataset.close()
+        reader.close()
         return sstubs
