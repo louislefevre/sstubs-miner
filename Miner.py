@@ -1,7 +1,7 @@
 from github import Github
 import random
 import DataAnalyser
-import DateMiner
+from DateMiner import DateMiner
 from BuildMiner import BuildMiner
 from JsonManager import JsonReader, JsonWriter
 from SStub import SStub
@@ -14,7 +14,9 @@ def mine(dataset_file, token, sstubs_file='results/sstubs.json'):
     build_miner = BuildMiner(github, sstubs, sstubs_file)
     build_miner.mine()
 
-    DateMiner.mine(github, sstubs)
+    date_miner = DateMiner(github, sstubs, sstubs_file)
+    date_miner.mine()
+
     DataAnalyser.analyse(sstubs)
 
 

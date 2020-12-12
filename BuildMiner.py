@@ -41,7 +41,7 @@ class BuildMiner:
             for name, build in self._projects.items():
                 if self._sstubs[i].project_name == name:
                     self._sstubs[i].build_system = build
-                    writer.update(str(i), '_build_system', build)
+                    writer.update(i, '_build_system', build)
 
     def _write_builds(self):
         writer = JsonWriter(self._output_file)

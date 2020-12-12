@@ -14,7 +14,7 @@ class JsonWriter:
     def update(self, index, key, value):
         with open(self._file_name, 'r+') as json_file:
             data = json.load(json_file)
-            data[index][key] = value
+            data[str(index)][key] = value
             json_file.seek(0)
             json.dump(data, json_file, indent=4)
             json_file.truncate()
