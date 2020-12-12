@@ -3,16 +3,15 @@ import random
 import BuildMiner
 import DataAnalyser
 import DateMiner
-from JsonManager import JsonWriter, JsonReader
+from JsonManager import JsonReader
 from SStub import SStub
 
 
 def mine(path, token):
     github = Github(token)
-    data_saver = JsonWriter('results.json')
     sstubs = _load_dataset(path)
 
-    BuildMiner.mine(github, data_saver, sstubs)
+    BuildMiner.mine(github, sstubs)
     DateMiner.mine(github, sstubs)
     DataAnalyser.analyse(sstubs)
 

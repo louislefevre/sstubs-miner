@@ -3,7 +3,7 @@ import json
 
 class JsonWriter:
     def __init__(self, file_name):
-        self._file_name = file_name
+        self._file_name = file_name + '.json'
 
     def write_object(self, obj):
         self._write(obj.__dict__)
