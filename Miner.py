@@ -1,8 +1,8 @@
 from github import Github
 import random
-import BuildMiner
 import DataAnalyser
 import DateMiner
+from BuildMiner import BuildMiner
 from JsonManager import JsonReader
 from SStub import SStub
 
@@ -11,7 +11,9 @@ def mine(path, token):
     github = Github(token)
     sstubs = _load_dataset(path)
 
-    BuildMiner.mine(github, sstubs)
+    build_miner = BuildMiner(github, sstubs)
+    build_miner.mine()
+
     DateMiner.mine(github, sstubs)
     DataAnalyser.analyse(sstubs)
 
