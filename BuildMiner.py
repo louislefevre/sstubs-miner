@@ -2,9 +2,10 @@ from JsonManager import JsonWriter
 
 
 class BuildMiner:
-    def __init__(self, github, sstubs, builds_file='data/builds.txt', output_file='results/builds.json'):
+    def __init__(self, github, sstubs, sstubs_file, builds_file='data/builds.txt', output_file='results/builds.json'):
         self._github = github
         self._sstubs = sstubs
+        self._sstubs_file = sstubs_file
         self._projects = self._load_projects(sstubs)
         self._builds = self._load_builds(builds_file)
         self._output_file = output_file
@@ -35,10 +36,12 @@ class BuildMiner:
                 self._builds['none'] += 1
 
     def _add_builds(self):
-        for sstub in self._sstubs:
+        writer = JsonWriter(self._sstubs_file)
+        for i in range(len(self._sstubs)):
             for name, build in self._projects.items():
-                if sstub.project_name == name:
-                    sstub.build_system = build
+                if self._sstubs[i].project_name == name:
+                    self._sstubs[i].build_system = build
+                    writer.update(str(i), '_build_system', build)
 
     def _write_builds(self):
         writer = JsonWriter(self._output_file)

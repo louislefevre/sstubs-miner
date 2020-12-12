@@ -3,23 +3,24 @@ import random
 import DataAnalyser
 import DateMiner
 from BuildMiner import BuildMiner
-from JsonManager import JsonReader
+from JsonManager import JsonReader, JsonWriter
 from SStub import SStub
 
 
-def mine(path, token):
+def mine(dataset_file, token, sstubs_file='results/sstubs.json'):
     github = Github(token)
-    sstubs = _load_dataset(path)
+    sstubs = _load_dataset(dataset_file, sstubs_file)
 
-    build_miner = BuildMiner(github, sstubs)
+    build_miner = BuildMiner(github, sstubs, sstubs_file)
     build_miner.mine()
 
     DateMiner.mine(github, sstubs)
     DataAnalyser.analyse(sstubs)
 
 
-def _load_dataset(path, randomise=False, size=0):
-    reader = JsonReader(path)
+def _load_dataset(input_file, output_file, randomise=False, size=0):
+    reader = JsonReader(input_file)
+    writer = JsonWriter(output_file)
     dataset = reader.read()
 
     if randomise:
@@ -27,12 +28,15 @@ def _load_dataset(path, randomise=False, size=0):
     if size == 0:
         size = len(dataset)
 
-    sstubs = []
+    sstubs_dict = {}
+    sstubs_list = []
     for i in range(size):
         obj = dataset[i]
-        sstub = SStub(i, obj['projectName'], obj['bugFilePath'], obj['sourceBeforeFix'],
+        sstub = SStub(obj['projectName'], obj['bugFilePath'], obj['sourceBeforeFix'],
                       obj['sourceAfterFix'], obj['fixCommitSHA1'])
-        sstubs.append(sstub)
+        sstubs_dict[i] = sstub.__dict__
+        sstubs_list.append(sstub)
 
+    writer.write(sstubs_dict, mode='x')
     reader.close()
-    return sstubs
+    return sstubs_list
