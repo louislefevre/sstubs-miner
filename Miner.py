@@ -3,33 +3,35 @@ import random
 import BuildMiner
 import DataAnalyser
 import DateMiner
-from JsonManager import JsonWriter
-from Dataset import Dataset
+from JsonManager import JsonWriter, JsonReader
+from SStub import SStub
 
 
 def mine(path, token):
-    dataset = Dataset(path)
     github = Github(token)
     data_saver = JsonWriter('results.json')
-    sstubs = dataset.get_sstubs()
-    sstubs = minimise_dataset(sstubs, 10)
+    sstubs = _load_dataset(path)
 
     BuildMiner.mine(github, data_saver, sstubs)
     DateMiner.mine(github, sstubs)
     DataAnalyser.analyse(sstubs)
 
 
-# Used for testing purposes only.
-def randomise_dataset(sstubs, size):
-    while True:
-        if len(sstubs) <= size:
-            break
-        rand = random.randint(0, len(sstubs)-1)
-        del sstubs[rand]
-    return sstubs
+def _load_dataset(path, randomise=False, size=0):
+    reader = JsonReader(path)
+    dataset = reader.read()
 
+    if randomise:
+        random.shuffle(dataset)
+    if size == 0:
+        size = len(dataset)
 
-# Used for testing purposes only.
-def minimise_dataset(sstubs, size):
-    del sstubs[:size]
+    sstubs = []
+    for i in range(size):
+        obj = dataset[i]
+        sstub = SStub(i, obj['projectName'], obj['bugFilePath'], obj['sourceBeforeFix'],
+                      obj['sourceAfterFix'], obj['fixCommitSHA1'])
+        sstubs.append(sstub)
+
+    reader.close()
     return sstubs
