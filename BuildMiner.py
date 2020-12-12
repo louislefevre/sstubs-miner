@@ -69,13 +69,13 @@ def print_results(builds, project_names):
 
 
 def mine(github, sstubs):
-    build_names = load_builds('builds.txt')
+    build_names = load_builds('data/builds.txt')
     project_names = load_names(sstubs)
 
     mine_repos(github, project_names, build_names)
     add_builds(sstubs, project_names)
 
-    writer = JsonWriter('builds')
+    writer = JsonWriter('results/builds')
     writer.write(build_names)
 
     print_results(build_names, project_names)
