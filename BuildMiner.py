@@ -76,6 +76,6 @@ def mine(github, sstubs):
     add_builds(sstubs, project_names)
 
     writer = JsonWriter('builds')
-    writer.write_dictionary(build_names)
+    writer.write(build_names)
 
     print_results(build_names, project_names)
