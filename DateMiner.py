@@ -1,3 +1,6 @@
+import datetime
+import time
+
 from JsonManager import JsonWriter
 
 
@@ -13,11 +16,10 @@ class DateMiner:
     def _mine_dates(self):
         current_project = None
         current_repo = None
-        counter = 0
         missing = 0
 
         for i in range(len(self._sstubs)):
-            self._update_status(counter, missing)
+            self._update_status(i, missing)
             sstub = self._sstubs[i]
 
             if sstub.project_name != current_project:
@@ -52,11 +54,23 @@ class DateMiner:
                 missing += 1
 
     def _update_status(self, counter, missing):
+        request_limit = self._github.get_rate_limit().core.limit
+        request_remaining = self._github.get_rate_limit().core.remaining
+        request_reset = self._github.get_rate_limit().core.reset
+        request_reset += datetime.timedelta(minutes=1)
+
         counter += 1
         total_sstubs = len(self._sstubs)
-        print('({}/{}) SStuBs Mined - {} missing'.format(counter, total_sstubs, missing), end='\r')
+        print('{}/{} SStuBs mined - {} missing ({}/{} requests remaining)'
+              .format(counter, total_sstubs, missing, request_remaining, request_limit), end='\r')
         if counter == total_sstubs:
             print()
+
+        if request_remaining < (request_limit * 0.01):
+            current_time = datetime.datetime.today()
+            sleep_time = (request_reset-current_time).total_seconds()
+            print('\nRequests limit exceeded - will resume at {}'.format(request_reset.strftime('%H:%M:%S')))
+            time.sleep(sleep_time)
 
     def _write(self, index, sstub):
         writer = JsonWriter(self._sstubs_file)
