@@ -1,6 +1,3 @@
-import datetime
-import time
-
 from JsonManager import JsonWriter
 
 
@@ -14,39 +11,30 @@ class DateMiner:
         self._mine_dates()
 
     def _mine_dates(self):
-        current_project = None
-        current_repo = None
-        missing = 0
+        index, missing = -1, 0
 
-        for i in range(len(self._sstubs)):
-            self._update_status(i, missing)
-            sstub = self._sstubs[i]
+        for sstub in self._sstubs:
+            index += 1
+            self._update_status(index, missing)
 
-            if sstub.project_name != current_project:
-                current_project = sstub.project_name
-                current_repo = self._github.get_repo(sstub.project_name)
-            repo = current_repo
-
-            fix_commit = repo.get_commit(sha=sstub.fix_sha)
-            fix_commit_date = fix_commit.commit.committer.date
-            commits = repo.get_commits(path=sstub.path, until=fix_commit_date)
+            fix_date = self._github.get_commit_date(sstub.project_name, sstub.fix_sha)
+            commits = self._github.get_commit_history(sstub.project_name, sstub.path, fix_date)
 
             for commit in commits:
                 if commit.sha == sstub.fix_sha:
                     continue
 
                 for file in commit.files:
-                    if file.filename == sstub.path:
-                        if file.patch is not None:
-                            source_bug = sstub.bug_source.replace(' ', '')
-                            patch = self._clean(file.patch)
+                    if file.filename == sstub.path and file.patch is not None:
+                        source_bug = sstub.bug_source.replace(' ', '')
+                        patch = self._clean_patch(file.patch)
 
-                            if source_bug in patch:
-                                sstub.bug_sha = commit.sha
-                                sstub.fix_time = fix_commit_date
-                                sstub.bug_time = commit.commit.committer.date
-                                self._write(i, sstub)
-                                break
+                        if source_bug in patch:
+                            sstub.bug_sha = commit.sha
+                            sstub.fix_time = fix_date
+                            sstub.bug_time = commit.commit.committer.date
+                            self._write(index, sstub)
+                            break
                 else:
                     continue
                 break
@@ -54,23 +42,14 @@ class DateMiner:
                 missing += 1
 
     def _update_status(self, counter, missing):
-        request_limit = self._github.get_rate_limit().core.limit
-        request_remaining = self._github.get_rate_limit().core.remaining
-        request_reset = self._github.get_rate_limit().core.reset
-        request_reset += datetime.timedelta(minutes=1)
-
         counter += 1
         total_sstubs = len(self._sstubs)
-        print('{}/{} SStuBs mined - {} missing ({}/{} requests remaining)'
-              .format(counter, total_sstubs, missing, request_remaining, request_limit), end='\r')
+        print('{}/{} SStuBs mined - {} missing ({} requests remaining)'
+              .format(counter, total_sstubs, missing, self._github.request_status()), end='\r')
         if counter == total_sstubs:
             print()
-
-        if request_remaining < (request_limit * 0.01):
-            current_time = datetime.datetime.today()
-            sleep_time = (request_reset-current_time).total_seconds()
-            print('\nRequests limit exceeded - will resume at {}'.format(request_reset.strftime('%H:%M:%S')))
-            time.sleep(sleep_time)
+        if self._github.exceeded_request_limit(0.01):
+            self._github.sleep(offset=1)
 
     def _write(self, index, sstub):
         writer = JsonWriter(self._sstubs_file)
@@ -79,7 +58,7 @@ class DateMiner:
         writer.update(index, '_bug_time', str(sstub.bug_time))
 
     @staticmethod
-    def _clean(patch):
+    def _clean_patch(patch):
         clean_patch = ''
         for line in patch.splitlines():
             line = line[1:]

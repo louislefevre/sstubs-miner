@@ -18,7 +18,7 @@ class BuildMiner:
 
     def _mine_builds(self):
         for project_name in self._projects.keys():
-            self._update_status(project_name)
+            self._update_status()
             repo = self._github.get_repo(project_name)
             contents = repo.get_contents('')
 
@@ -47,11 +47,10 @@ class BuildMiner:
         writer = JsonWriter(self._output_file)
         writer.write(self._builds)
 
-    def _update_status(self, name):
+    def _update_status(self):
         self._counter += 1
         total_projects = len(self._projects)
-        blank_string = '                                   '
-        print('({}/{}) {}{}'.format(self._counter, total_projects, name, blank_string), end='\r')
+        print('{}/{} Builds mined'.format(self._counter, total_projects), end='\r')
         if self._counter == total_projects:
             print()
 
