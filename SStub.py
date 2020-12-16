@@ -6,8 +6,8 @@ class SStub:
         self._fix_source = fix_source
         self._fix_sha = fix_sha
         self._bug_sha = None
-        self._fix_time = None
-        self._bug_time = None
+        self._fix_date = None
+        self._bug_date = None
         self._build_system = None
 
     @property
@@ -40,20 +40,20 @@ class SStub:
         self._bug_sha = sha
 
     @property
-    def fix_time(self):
-        return self._fix_time
+    def fix_date(self):
+        return self._fix_date
 
-    @fix_time.setter
-    def fix_time(self, time):
-        self._fix_time = time
+    @fix_date.setter
+    def fix_date(self, time):
+        self._fix_date = time
 
     @property
-    def bug_time(self):
-        return self._bug_time
+    def bug_date(self):
+        return self._bug_date
 
-    @bug_time.setter
-    def bug_time(self, time):
-        self._bug_time = time
+    @bug_date.setter
+    def bug_date(self, time):
+        self._bug_date = time
 
     @property
     def build_system(self):
@@ -65,4 +65,4 @@ class SStub:
 
     @property
     def time_difference(self):
-        return self.fix_time - self.bug_time
+        return self.fix_date - self.bug_date

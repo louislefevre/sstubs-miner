@@ -31,8 +31,8 @@ class DateMiner:
 
                         if source_bug in patch:
                             sstub.bug_sha = commit.sha
-                            sstub.fix_time = fix_date
-                            sstub.bug_time = commit.commit.committer.date
+                            sstub.fix_date = fix_date
+                            sstub.bug_date = commit.commit.committer.date
                             self._write(index, sstub)
                             break
                 else:
@@ -54,8 +54,8 @@ class DateMiner:
     def _write(self, index, sstub):
         writer = JsonWriter(self._sstubs_file)
         writer.update(index, '_bug_sha', sstub.bug_sha)
-        writer.update(index, '_fix_time', str(sstub.fix_time))
-        writer.update(index, '_bug_time', str(sstub.bug_time))
+        writer.update(index, '_fix_time', str(sstub.fix_date))
+        writer.update(index, '_bug_time', str(sstub.bug_date))
 
     @staticmethod
     def _clean_patch(patch):

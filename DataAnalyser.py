@@ -10,7 +10,7 @@ def clean_data(sstubs):
     new_sstubs = []
     counter = 0
     for sstub in sstubs:
-        if sstub.bug_sha is None or sstub.bug_time is None or sstub.fix_time is None:
+        if sstub.bug_sha is None or sstub.bug_date is None or sstub.fix_date is None:
             counter += 1
             continue
         new_sstubs.append(sstub)
