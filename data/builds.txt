@@ -1,8 +1,8 @@
-makefile
-build.xml
-pom.xml
 build.gradle
 build.gradle.kts
+pom.xml
 build
 build.bazel
+build.xml
+makefile
 cmakelists.txt
