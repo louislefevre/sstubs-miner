@@ -17,8 +17,7 @@ class BuildMiner:
 
     def _mine_builds(self):
         for project_name in self._projects.keys():
-            repo = self._github.get_repo(project_name)
-            contents = repo.get_contents('')
+            contents = self._github.get_contents('')
 
             for file in contents:
                 file_name = file.name.lower()

@@ -18,6 +18,12 @@ class GithubMiner:
             self._current_repo = self._github.get_repo(name)
         return self._current_repo
 
+    def get_contents(self, name, path, ref=None):
+        return self.get_repo(name).get_contents(path, ref)
+
+    def get_contents_loc(self, name, path, ref=None):
+        return len(self.get_contents(name, path, ref).decoded_content.splitlines())
+
     def get_commit(self, name, sha):
         if sha != self._current_sha:
             self._current_sha = sha
@@ -31,30 +37,17 @@ class GithubMiner:
         return self.get_repo(name).get_commits(path=path, until=date)
 
     def exceeded_request_limit(self, offset=0):
-        return self.request_remaining < (self.request_limit * offset)
+        remaining, limit = self._github.rate_limiting
+        return remaining < (limit * offset)
 
     def sleep(self, offset=0):
+        reset_time = self._github.get_rate_limit().core.reset
         current_time = datetime.datetime.today()
-        wake_time = self.request_reset + datetime.timedelta(minutes=offset)
+        wake_time = reset_time + datetime.timedelta(minutes=offset)
         sleep_time = (wake_time - current_time).total_seconds()
         print('\nRequests limit exceeded - will resume at {}'.format(wake_time.strftime('%H:%M:%S')))
         time.sleep(sleep_time)
 
     def request_status(self):
-        return '{}/{}'.format(self.request_remaining, self.request_limit)
-
-    @property
-    def github(self):
-        return self._github
-
-    @property
-    def request_limit(self):
-        return self._github.get_rate_limit().core.limit
-
-    @property
-    def request_remaining(self):
-        return self._github.get_rate_limit().core.remaining
-
-    @property
-    def request_reset(self):
-        return self._github.get_rate_limit().core.reset
+        remaining, limit = self._github.rate_limiting
+        return '{}/{}'.format(remaining, limit)

@@ -33,6 +33,7 @@ class BugMiner:
                             sstub.bug_sha = commit.sha
                             sstub.fix_date = fix_date
                             sstub.bug_date = commit.commit.committer.date
+                            sstub.loc = self._github.get_contents_loc(sstub.project_name, sstub.path, ref=commit.sha)
                             break
                 else:
                     continue

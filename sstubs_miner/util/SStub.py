@@ -9,6 +9,7 @@ class SStub:
         self._bug_sha = None
         self._fix_date = None
         self._bug_date = None
+        self._loc = None
         self._build_system = None
 
     @property
@@ -59,6 +60,14 @@ class SStub:
     @bug_date.setter
     def bug_date(self, time):
         self._bug_date = str(time)
+
+    @property
+    def loc(self):
+        return self._loc
+
+    @loc.setter
+    def loc(self, loc):
+        self._loc = loc
 
     @property
     def build_system(self):
