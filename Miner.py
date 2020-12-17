@@ -26,8 +26,8 @@ def main():
     github = GithubMiner(access_token)
     sstubs = _load_dataset(dataset_file)
 
-    build_miner = BuildMiner(github, sstubs)
-    build_miner.mine()
+    #build_miner = BuildMiner(github, sstubs)
+    #build_miner.mine()
 
     bug_miner = BugMiner(github, sstubs, sstubs_file)
     bug_miner.mine()
@@ -45,7 +45,7 @@ def _load_dataset(input_file, randomise=False, size=0):
     sstubs_list = []
     for i in range(size):
         obj = dataset[i]
-        sstub = SStub(obj['projectName'], obj['bugFilePath'], obj['sourceBeforeFix'],
+        sstub = SStub(i, obj['projectName'], obj['bugFilePath'], obj['sourceBeforeFix'],
                       obj['sourceAfterFix'], obj['fixCommitSHA1'])
         sstubs_list.append(sstub)
 

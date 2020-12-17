@@ -1,5 +1,6 @@
 class SStub:
-    def __init__(self, project_name, path, bug_source, fix_source, fix_sha):
+    def __init__(self, index, project_name, path, bug_source, fix_source, fix_sha):
+        self._index = index
         self._project_name = project_name
         self._path = path
         self._bug_source = bug_source
@@ -9,6 +10,10 @@ class SStub:
         self._fix_date = None
         self._bug_date = None
         self._build_system = None
+
+    @property
+    def index(self):
+        return self._index
 
     @property
     def project_name(self):

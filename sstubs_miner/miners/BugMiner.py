@@ -40,7 +40,7 @@ class BugMiner:
             else:
                 self._missing += 1
 
-            writer.write({self._counter: sstub.__dict__}, mode='a')
+            writer.write(sstub, mode='a')
             self._update_status()
 
     def _update_status(self):
