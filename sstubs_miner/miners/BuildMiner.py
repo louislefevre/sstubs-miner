@@ -50,9 +50,12 @@ class BuildMiner:
     def _update_status(self):
         self._counter += 1
         total_projects = len(self._projects)
-        print('{}/{} Builds mined'.format(self._counter, total_projects), end='\r')
+        print('{}/{} Builds mined ({} requests remaining)'
+              .format(self._counter, total_projects, self._github.request_status()), end='\r')
         if self._counter == total_projects:
             print()
+        if self._github.exceeded_request_limit(0.01):
+            self._github.sleep(offset=1)
 
     @staticmethod
     def _load_projects(sstubs):
