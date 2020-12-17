@@ -45,7 +45,7 @@ class SStub:
 
     @fix_date.setter
     def fix_date(self, time):
-        self._fix_date = time
+        self._fix_date = str(time)
 
     @property
     def bug_date(self):
@@ -53,7 +53,7 @@ class SStub:
 
     @bug_date.setter
     def bug_date(self, time):
-        self._bug_date = time
+        self._bug_date = str(time)
 
     @property
     def build_system(self):

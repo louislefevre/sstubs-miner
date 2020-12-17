@@ -1,7 +1,7 @@
 from sstubs_miner.util.JsonManager import JsonWriter
 
 
-class DateMiner:
+class BugMiner:
     def __init__(self, github, sstubs, sstubs_file, output_file='results/count.json'):
         self._github = github
         self._sstubs = sstubs
@@ -11,12 +11,12 @@ class DateMiner:
         self._missing = 0
 
     def mine(self):
-        self._mine_dates()
+        self._mine_bugs()
 
-    def _mine_dates(self):
+    def _mine_bugs(self):
+        writer = JsonWriter(self._sstubs_file)
+
         for sstub in self._sstubs:
-            self._update_status()
-
             fix_date = self._github.get_commit_date(sstub.project_name, sstub.fix_sha)
             commits = self._github.get_commit_history(sstub.project_name, sstub.path, fix_date)
 
@@ -33,13 +33,15 @@ class DateMiner:
                             sstub.bug_sha = commit.sha
                             sstub.fix_date = fix_date
                             sstub.bug_date = commit.commit.committer.date
-                            self._write(self._counter-1, sstub)
                             break
                 else:
                     continue
                 break
             else:
                 self._missing += 1
+
+            writer.write({self._counter: sstub.__dict__}, mode='a')
+            self._update_status()
 
     def _update_status(self):
         self._counter += 1
@@ -50,12 +52,6 @@ class DateMiner:
             print()
         if self._github.exceeded_request_limit(0.01):
             self._github.sleep(offset=1)
-
-    def _write(self, index, sstub):
-        writer = JsonWriter(self._sstubs_file)
-        writer.update(index, '_bug_sha', sstub.bug_sha)
-        writer.update(index, '_fix_time', str(sstub.fix_date))
-        writer.update(index, '_bug_time', str(sstub.bug_date))
 
     @staticmethod
     def _clean_patch(patch):
