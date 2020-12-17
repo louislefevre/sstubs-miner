@@ -8,23 +8,6 @@ from sstubs_miner.util.SStub import SStub
 
 
 def main():
-    _main_options()
-    while True:
-        option: str = input()
-
-        if option == '0' or not option:
-            break
-        elif option == '1':
-            _miner()
-            break
-        elif option == '2':
-            _analyser()
-            break
-        else:
-            print("Invalid input - select an option from the list")
-
-
-def _miner():
     access_token: str = input('Access Token: ')
     if not validate_token(access_token, 40):
         print("Invalid access token - must be 40 characters in length")
@@ -43,42 +26,11 @@ def _miner():
     github = GithubMiner(access_token)
     sstubs = _load_dataset(dataset_file, sstubs_file)
 
-    _miner_options()
-    while True:
-        option: str = input()
+    build_miner = BuildMiner(github, sstubs, sstubs_file)
+    build_miner.mine()
 
-        if option == '0':
-            break
-        elif option == '1':
-            build_miner = BuildMiner(github, sstubs, sstubs_file)
-            build_miner.mine()
-        elif option == '2':
-            date_miner = DateMiner(github, sstubs, sstubs_file)
-            date_miner.mine()
-        else:
-            print("Invalid input - select an option from the list")
-
-
-def _analyser():
-    pass
-
-
-def _main_options():
-    print()
-    print('0: Exit')
-    print('1: Miners')
-    print('2: Analysers')
-
-
-def _miner_options():
-    print()
-    print('0: Exit')
-    print('1: Build Miner')
-    print('2: Date Miner')
-
-
-def _analyser_options():
-    pass
+    date_miner = DateMiner(github, sstubs, sstubs_file)
+    date_miner.mine()
 
 
 def _load_dataset(input_file, output_file, randomise=False, size=0):
@@ -103,3 +55,7 @@ def _load_dataset(input_file, output_file, randomise=False, size=0):
     writer.write(sstubs_dict, mode='x')
     reader.close()
     return sstubs_list
+
+
+if __name__ == '__main__':
+    main()

@@ -36,19 +36,12 @@ class BuildMiner:
                 self._builds['none'] += 1
 
     def _add_builds(self):
-        writer = JsonWriter('results/project_builds.json')
-        writer.write(self._projects, mode='x')
-
-        writer = JsonWriter(self._sstubs_file)
         sstub_dict = {}
         for i in range(len(self._sstubs)):
             sstub_dict[i] = self._sstubs[i]
             for name, build in self._projects.items():
                 if self._sstubs[i].project_name == name:
                     self._sstubs[i].build_system = build
-                    #writer.update(i, '_build_system', build)
-
-        writer.write(sstub_dict)
 
     def _write_builds(self):
         writer = JsonWriter(self._output_file)
@@ -58,11 +51,11 @@ class BuildMiner:
         self._counter += 1
         total_projects = len(self._projects)
         print('{}/{} Builds mined ({} requests remaining)'
-              .format(self._counter, total_projects, 0), end='\r')
+              .format(self._counter, total_projects, self._github.request_status()), end='\r')
         if self._counter == total_projects:
             print()
-        #if self._github.exceeded_request_limit(0.01):
-        #    self._github.sleep(offset=1)
+        if self._github.exceeded_request_limit(0.01):
+            self._github.sleep(offset=1)
 
     @staticmethod
     def _load_projects(sstubs):

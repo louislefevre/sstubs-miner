@@ -2,20 +2,20 @@ from sstubs_miner.util.JsonManager import JsonWriter
 
 
 class DateMiner:
-    def __init__(self, github, sstubs, sstubs_file):
+    def __init__(self, github, sstubs, sstubs_file, output_file='results/count.json'):
         self._github = github
         self._sstubs = sstubs
         self._sstubs_file = sstubs_file
+        self._output_file = output_file
+        self._counter = 0
+        self._missing = 0
 
     def mine(self):
         self._mine_dates()
 
     def _mine_dates(self):
-        index, missing = -1, 0
-
         for sstub in self._sstubs:
-            index += 1
-            self._update_status(index, missing)
+            self._update_status()
 
             fix_date = self._github.get_commit_date(sstub.project_name, sstub.fix_sha)
             commits = self._github.get_commit_history(sstub.project_name, sstub.path, fix_date)
@@ -33,20 +33,20 @@ class DateMiner:
                             sstub.bug_sha = commit.sha
                             sstub.fix_date = fix_date
                             sstub.bug_date = commit.commit.committer.date
-                            self._write(index, sstub)
+                            self._write(self._counter-1, sstub)
                             break
                 else:
                     continue
                 break
             else:
-                missing += 1
+                self._missing += 1
 
-    def _update_status(self, counter, missing):
-        counter += 1
+    def _update_status(self):
+        self._counter += 1
         total_sstubs = len(self._sstubs)
         print('{}/{} SStuBs mined - {} missing ({} requests remaining)'
-              .format(counter, total_sstubs, missing, self._github.request_status()), end='\r')
-        if counter == total_sstubs:
+              .format(self._counter, total_sstubs, self._missing, self._github.request_status()), end='\r')
+        if self._counter == total_sstubs:
             print()
         if self._github.exceeded_request_limit(0.01):
             self._github.sleep(offset=1)
