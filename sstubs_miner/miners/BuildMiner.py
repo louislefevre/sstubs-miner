@@ -1,4 +1,4 @@
-from JsonManager import JsonWriter
+from sstubs_miner.util.JsonManager import JsonWriter
 
 
 class BuildMiner:
