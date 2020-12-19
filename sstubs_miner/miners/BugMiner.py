@@ -3,11 +3,10 @@ from sstubs_miner.util.SStub import SStub
 
 
 class BugMiner:
-    def __init__(self, github, sstubs, results_file, output_file='results/count.json'):
+    def __init__(self, github, sstubs, results_file):
         self._github = github
         self._sstubs = sstubs
         self._results_file = results_file
-        self._output_file = output_file
         self._counter = 0
         self._missing = 0
 
@@ -59,6 +58,7 @@ class BugMiner:
     def _clean_patch(patch):
         clean_patch = ''
         for line in patch.splitlines():
-            line = line[1:]
-            clean_patch += line.replace(' ', '')
+            if line.startswith('+') or line.startswith('-'):
+                line = line[1:]
+                clean_patch += line.replace(' ', '')
         return clean_patch
