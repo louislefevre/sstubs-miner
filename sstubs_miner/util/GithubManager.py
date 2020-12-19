@@ -6,7 +6,9 @@ from github import Github
 
 class GithubMiner:
     def __init__(self, token):
+        self._token = token
         self._github = Github(token)
+        self._limit = self._github.get_rate_limit().core.limit
         self._current_project = None
         self._current_repo = None
         self._current_sha = None
@@ -45,8 +47,8 @@ class GithubMiner:
         return self.get_repo(name).get_commits(path=path, until=date)
 
     def exceeded_request_limit(self, offset=0):
-        remaining, limit = self._github.rate_limiting
-        return remaining < (limit * offset)
+        remaining = self._github.get_rate_limit().core.remaining
+        return remaining < (self._limit * offset)
 
     def sleep(self, offset=0):
         reset_time = self._github.get_rate_limit().core.reset
@@ -55,7 +57,8 @@ class GithubMiner:
         sleep_time = (wake_time - current_time).total_seconds()
         print('\nRequests limit exceeded - will resume at {}'.format(wake_time.strftime('%H:%M:%S')))
         time.sleep(sleep_time)
+        self._github = Github(self._token)
 
     def request_status(self):
-        remaining, limit = self._github.rate_limiting
-        return '{}/{}'.format(remaining, limit)
+        remaining = self._github.get_rate_limit().core.remaining
+        return '{}/{}'.format(remaining, self._limit)

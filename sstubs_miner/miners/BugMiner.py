@@ -17,6 +17,9 @@ class BugMiner:
         writer = CSVWriter(self._results_file, SStub.attribute_names())
 
         for sstub in self._sstubs:
+            if self._github.exceeded_request_limit(0.05):
+                self._github.sleep(offset=5)
+
             fix_date = self._github.get_commit_date(sstub.project_name, sstub.fix_sha)
             fix_patch = self._github.get_commit_patch(sstub.project_name, sstub.fix_sha, sstub.path)
             commits = self._github.get_commit_history(sstub.project_name, sstub.path, fix_date)
@@ -52,8 +55,6 @@ class BugMiner:
               .format(self._counter, total_sstubs, self._missing, self._github.request_status()), end='\r')
         if self._counter == total_sstubs:
             print()
-        if self._github.exceeded_request_limit(0.01):
-            self._github.sleep(offset=1)
 
     @staticmethod
     def _clean_patch(patch):

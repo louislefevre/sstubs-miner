@@ -19,6 +19,9 @@ class BuildMiner:
 
     def _mine_builds(self):
         for project_name in self._projects.keys():
+            if self._github.exceeded_request_limit(0.01):
+                self._github.sleep(offset=1)
+
             contents = self._github.get_contents(project_name, '')
 
             for file in contents:
@@ -58,8 +61,6 @@ class BuildMiner:
               .format(self._counter, total_projects, self._github.request_status()), end='\r')
         if self._counter == total_projects:
             print()
-        if self._github.exceeded_request_limit(0.01):
-            self._github.sleep(offset=1)
 
     @staticmethod
     def _load_projects(sstubs):
