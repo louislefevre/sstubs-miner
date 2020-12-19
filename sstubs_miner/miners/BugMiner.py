@@ -18,6 +18,7 @@ class BugMiner:
 
         for sstub in self._sstubs:
             fix_date = self._github.get_commit_date(sstub.project_name, sstub.fix_sha)
+            fix_patch = self._github.get_commit_patch(sstub.project_name, sstub.fix_sha, sstub.path)
             commits = self._github.get_commit_history(sstub.project_name, sstub.path, fix_date)
 
             for commit in commits:
@@ -25,7 +26,7 @@ class BugMiner:
                     continue
 
                 for file in commit.files:
-                    if file.filename == sstub.path and file.patch is not None:
+                    if file.filename == sstub.path and file.patch is not None and file.patch != fix_patch:
                         source_bug = sstub.bug_source.replace(' ', '')
                         patch = self._clean_patch(file.patch)
 
@@ -58,7 +59,7 @@ class BugMiner:
     def _clean_patch(patch):
         clean_patch = ''
         for line in patch.splitlines():
-            if line.startswith('+') or line.startswith('-'):
+            if line.startswith('+'):
                 line = line[1:]
                 clean_patch += line.replace(' ', '')
         return clean_patch

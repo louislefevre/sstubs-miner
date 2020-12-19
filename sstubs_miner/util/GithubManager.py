@@ -32,6 +32,12 @@ class GithubMiner:
             self._current_commit = self.get_repo(name).get_commit(sha=sha)
         return self._current_commit
 
+    def get_commit_patch(self, name, sha, file_name):
+        commit = self.get_commit(name, sha)
+        for file in commit.files:
+            if file.filename == file_name and file.patch is not None:
+                return file.patch
+
     def get_commit_date(self, name, sha):
         return self.get_commit(name, sha).commit.committer.date
 
