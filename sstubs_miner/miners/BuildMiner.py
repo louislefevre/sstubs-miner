@@ -2,18 +2,20 @@ from sstubs_miner.util.JsonManager import JsonWriter
 
 
 class BuildMiner:
-    def __init__(self, github, sstubs, builds_file='data/builds.txt', output_file='results/builds.json'):
+    def __init__(self, github, sstubs):
         self._github = github
         self._sstubs = sstubs
         self._projects = self._load_projects(sstubs)
-        self._builds = self._load_builds(builds_file)
-        self._output_file = output_file
+        self._projects_file = 'results/project_builds.json'
+        self._builds = self._load_builds('data/builds.txt')
+        self._builds_file = 'results/builds.json'
         self._counter = 0
 
     def mine(self):
         self._mine_builds()
         self._add_builds()
         self._write_builds()
+        self._write_projects()
 
     def _mine_builds(self):
         for project_name in self._projects.keys():
@@ -42,8 +44,12 @@ class BuildMiner:
                     self._sstubs[i].build_system = build
 
     def _write_builds(self):
-        writer = JsonWriter(self._output_file)
+        writer = JsonWriter(self._builds_file)
         writer.write(self._builds)
+
+    def _write_projects(self):
+        writer = JsonWriter(self._projects_file)
+        writer.write(self._projects)
 
     def _update_status(self):
         self._counter += 1
