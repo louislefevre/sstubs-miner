@@ -57,14 +57,9 @@ class BuildMiner:
 
     @staticmethod
     def _load_projects(sstubs):
-        projects_set = set()
-        for sstub in sstubs:
-            projects_set.add(sstub.project_name)
-
         project_dict = {}
-        for name in projects_set:
-            project_dict[name] = ''
-
+        for sstub in sstubs:
+            project_dict[sstub.project_name] = ''
         return project_dict
 
     @staticmethod

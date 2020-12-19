@@ -19,6 +19,8 @@ class GithubMiner:
         return self._current_repo
 
     def get_contents(self, name, path, ref=None):
+        if ref is None:
+            return self.get_repo(name).get_contents(path)
         return self.get_repo(name).get_contents(path, ref)
 
     def get_contents_loc(self, name, path, ref=None):
