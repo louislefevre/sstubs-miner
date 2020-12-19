@@ -3,7 +3,7 @@ from sstubs_miner.miners.BugMiner import BugMiner
 from sstubs_miner.miners.BuildMiner import BuildMiner
 from sstubs_miner.util.GithubManager import GithubMiner
 from sstubs_miner.util.InputManager import validate_path, validate_extension, validate_token, file_exists
-from sstubs_miner.util.JsonManager import JsonReader, JsonWriter
+from sstubs_miner.util.JsonManager import JsonReader
 from sstubs_miner.util.SStub import SStub
 
 
@@ -18,18 +18,18 @@ def main():
         print("Invalid access token - must be 40 characters in length")
         return
 
-    sstubs_file = 'results/sstubs.json'
-    if file_exists(sstubs_file):
+    results_file = 'results/sstubs.csv'
+    if file_exists(results_file):
         print("Results file already exists - remove 'results/sstubs.json'")
         return
 
     github = GithubMiner(access_token)
     sstubs = _load_dataset(dataset_file)
 
-    #build_miner = BuildMiner(github, sstubs)
-    #build_miner.mine()
+    build_miner = BuildMiner(github, sstubs)
+    build_miner.mine()
 
-    bug_miner = BugMiner(github, sstubs, sstubs_file)
+    bug_miner = BugMiner(github, sstubs, results_file)
     bug_miner.mine()
 
 

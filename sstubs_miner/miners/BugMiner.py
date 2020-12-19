@@ -1,11 +1,12 @@
-from sstubs_miner.util.JsonManager import JsonWriter
+from sstubs_miner.util.CSVManager import CSVWriter
+from sstubs_miner.util.SStub import SStub
 
 
 class BugMiner:
-    def __init__(self, github, sstubs, sstubs_file, output_file='results/count.json'):
+    def __init__(self, github, sstubs, results_file, output_file='results/count.json'):
         self._github = github
         self._sstubs = sstubs
-        self._sstubs_file = sstubs_file
+        self._results_file = results_file
         self._output_file = output_file
         self._counter = 0
         self._missing = 0
@@ -14,7 +15,7 @@ class BugMiner:
         self._mine_bugs()
 
     def _mine_bugs(self):
-        writer = JsonWriter(self._sstubs_file)
+        writer = CSVWriter(self._results_file, SStub.attribute_names())
 
         for sstub in self._sstubs:
             fix_date = self._github.get_commit_date(sstub.project_name, sstub.fix_sha)
@@ -41,7 +42,7 @@ class BugMiner:
             else:
                 self._missing += 1
 
-            writer.write(sstub, mode='a')
+            writer.write(sstub.attribute_list())
             self._update_status()
 
     def _update_status(self):

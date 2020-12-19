@@ -1,5 +1,6 @@
 # The dataset(s) should not be committed to the repository.
 *.json
+*.csv
 /.idea
 __pycache__/
 Sandbox.py

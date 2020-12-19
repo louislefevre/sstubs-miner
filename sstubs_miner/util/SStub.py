@@ -3,14 +3,25 @@ class SStub:
         self._index = index
         self._project_name = project_name
         self._path = path
+        self._build_system = None
+        self._loc = None
         self._bug_source = bug_source
         self._fix_source = fix_source
-        self._fix_sha = fix_sha
         self._bug_sha = None
-        self._fix_date = None
+        self._fix_sha = fix_sha
         self._bug_date = None
-        self._loc = None
-        self._build_system = None
+        self._fix_date = None
+
+    @staticmethod
+    def attribute_names():
+        return ['index', 'project_name', 'path', 'build_system',
+                'loc', 'bug_source', 'fix_source', 'bug_sha',
+                'fix_sha', 'bug_date', 'fix_date', ]
+
+    def attribute_list(self):
+        return [self.index, self.project_name, self.path, self.build_system,
+                self.loc, self.bug_source, self.fix_source, self.bug_sha,
+                self.fix_sha, self.bug_date, self.fix_date]
 
     @property
     def index(self):
