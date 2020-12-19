@@ -1,50 +1,51 @@
+import json
+import os
 import random
 from sstubs_miner.miners.BugMiner import BugMiner
 from sstubs_miner.miners.BuildMiner import BuildMiner
-from sstubs_miner.util.CSVManager import CSVReader
+from sstubs_miner.util.CSVManager import CSVReader, CSVWriter
 from sstubs_miner.util.GithubManager import GithubMiner
-from sstubs_miner.util.InputManager import validate_path, validate_extension, validate_token, file_exists
-from sstubs_miner.util.JsonManager import JsonReader
 from sstubs_miner.util.SStub import SStub
 
 
 def main():
-    dataset_file: str = input('Dataset Path: ')
-    if not validate_path(dataset_file) or not validate_extension(dataset_file, '.json'):
-        print("Invalid path - file must be a valid JSON file")
-        return
-
-    access_token: str = input('Access Token: ')
-    if not validate_token(access_token, 40):
-        print("Invalid access token - must be 40 characters in length")
-        return
+    dataset_file = 'data/sstubsLarge-0104.json'
+    results_file = 'testing/sstubs-test.csv'
+    access_tokens = _load_tokens('data/tokens')
 
     sstubs = _load_dataset(dataset_file)
-    github = GithubMiner(access_token)
+    if os.path.isfile(results_file):
+        sstubs = _trim_dataset(results_file, sstubs)
 
-    results_file = 'results/sstubs.csv'
-    if file_exists(results_file):
-        print("'{}' already exists - would you like to continue from where you left off? [yes/no]".format(results_file))
-        choice: str = input()
-        if choice == 'yes' or choice == 'y':
-            sstubs = _trim_dataset(results_file, sstubs)
-        elif choice == 'no' or choice == 'n':
-            print("Remove '{}' and rerun the program".format(results_file))
-            return
-        else:
-            print('Invalid input')
-            return
+    github = GithubMiner(access_tokens)
+    build_miner = BuildMiner(github)
+    bug_miner = BugMiner(github)
 
-    build_miner = BuildMiner(github, sstubs)
-    build_miner.mine()
+    writer = CSVWriter(results_file, SStub.attribute_names())
+    counter = 0
+    for sstub in sstubs:
+        if github.exceeded_request_limit(offset=0.05):
+            github.switch_connection(request_offset=0.5, sleep_offset=2)
 
-    bug_miner = BugMiner(github, sstubs, results_file)
-    bug_miner.mine()
+        build_miner.mine(sstub)
+        bug_miner.mine(sstub)
+        writer.write(sstub.attribute_list())
+
+        counter += 1
+        _update_status(counter, len(sstubs), github.request_status())
+
+
+def _load_tokens(tokens_file):
+    tokens = []
+    with open(tokens_file) as file:
+        for line in file:
+            tokens.append(line.strip())
+    return tokens
 
 
 def _load_dataset(input_file, randomise=False, size=0):
-    reader = JsonReader(input_file)
-    dataset = reader.read()
+    file = open(input_file)
+    dataset = json.load(file)
 
     if randomise:
         random.shuffle(dataset)
@@ -58,7 +59,7 @@ def _load_dataset(input_file, randomise=False, size=0):
                       obj['sourceAfterFix'], obj['fixCommitSHA1'])
         sstubs_list.append(sstub)
 
-    reader.close()
+    file.close()
     return sstubs_list
 
 
@@ -68,6 +69,13 @@ def _trim_dataset(output_file, sstubs):
     last = data[-1]
     start_point = int(last['index']) + 1
     return sstubs[start_point:]
+
+
+def _update_status(counter, total, requests):
+    counter += 1
+    print('{}/{} SStuBs Mined ({} requests remaining)'.format(counter, total, requests), end='\r')
+    if counter == total:
+        print()
 
 
 if __name__ == '__main__':

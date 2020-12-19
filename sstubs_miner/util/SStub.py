@@ -12,16 +12,16 @@ class SStub:
         self._bug_date = None
         self._fix_date = None
 
+    def attribute_list(self):
+        return [self.index, self.project_name, self.path, self.build_system,
+                self.loc, self.bug_source, self.fix_source, self.bug_sha,
+                self.fix_sha, self.bug_date, self.fix_date]
+
     @staticmethod
     def attribute_names():
         return ['index', 'project_name', 'path', 'build_system',
                 'loc', 'bug_source', 'fix_source', 'bug_sha',
                 'fix_sha', 'bug_date', 'fix_date', ]
-
-    def attribute_list(self):
-        return [self.index, self.project_name, self.path, self.build_system,
-                self.loc, self.bug_source, self.fix_source, self.bug_sha,
-                self.fix_sha, self.bug_date, self.fix_date]
 
     @property
     def index(self):
@@ -87,7 +87,3 @@ class SStub:
     @build_system.setter
     def build_system(self, build_system):
         self._build_system = build_system
-
-    @property
-    def time_difference(self):
-        return self.fix_date - self.bug_date

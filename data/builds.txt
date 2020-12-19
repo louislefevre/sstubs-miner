@@ -1,5 +1,0 @@
-build.gradle
-build.gradle.kts
-pom.xml
-build
-build.bazel

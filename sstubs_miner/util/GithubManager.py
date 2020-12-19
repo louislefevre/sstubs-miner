@@ -5,9 +5,9 @@ from github import Github
 
 
 class GithubMiner:
-    def __init__(self, token):
-        self._token = token
-        self._github = Github(token)
+    def __init__(self, tokens):
+        self._github_instances = self._initialise_instances(tokens)
+        self._github = self._github_instances[0]
         self._limit = self._github.get_rate_limit().core.limit
         self._current_project = None
         self._current_repo = None
@@ -57,8 +57,37 @@ class GithubMiner:
         sleep_time = (wake_time - current_time).total_seconds()
         print('\nRequests limit exceeded - will resume at {}'.format(wake_time.strftime('%H:%M:%S')))
         time.sleep(sleep_time)
-        self._github = Github(self._token)
 
     def request_status(self):
         remaining = self._github.get_rate_limit().core.remaining
         return '{}/{}'.format(remaining, self._limit)
+
+    def get_lowest_reset(self):
+        resets = {}
+        for github in self._github_instances:
+            resets[github] = github.get_rate_limit().core.reset
+        github = min(resets, key=resets.get)
+        return github
+
+    def get_highest_remaining(self):
+        remaining = {}
+        for github in self._github_instances:
+            remaining[github] = github.get_rate_limit().core.remaining
+        github = max(remaining, key=remaining.get)
+        return github
+
+    def switch_connection(self, request_offset=0, sleep_offset=0):
+        highest_remaining = self.get_highest_remaining()
+        if highest_remaining.get_rate_limit().core.remaining > (highest_remaining.get_rate_limit().core.limit * request_offset):
+            self._github = highest_remaining
+        else:
+            self._github = self.get_lowest_reset()
+            self.sleep(offset=sleep_offset)
+        self._limit = self._github.get_rate_limit().core.limit
+
+    @staticmethod
+    def _initialise_instances(tokens):
+        instances = []
+        for token in tokens:
+            instances.append(Github(token))
+        return instances
