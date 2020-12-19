@@ -1,7 +1,10 @@
-# The dataset(s) should not be committed to the repository.
-*.json
-*.csv
+# Directories
 /.idea
 __pycache__/
-Sandbox.py
-todo.txt
+data/
+results/
+
+# Files
+*.json
+*.csv
+notes.txt
