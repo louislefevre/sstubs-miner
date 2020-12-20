@@ -4,20 +4,20 @@ import random
 from sstubs_miner.miners.BugMiner import BugMiner
 from sstubs_miner.miners.BuildMiner import BuildMiner
 from sstubs_miner.util.CSVManager import CSVReader, CSVWriter
-from sstubs_miner.util.GithubManager import GithubMiner
+from sstubs_miner.util.GithubManager import GithubManager
 from sstubs_miner.util.SStub import SStub
 
 
 def main():
     dataset_file = 'data/sstubsLarge-0104.json'
-    results_file = 'testing/sstubs-test.csv'
+    results_file = 'results/sstubs.csv'
     access_tokens = _load_tokens('data/tokens')
 
     sstubs = _load_dataset(dataset_file)
     if os.path.isfile(results_file):
         sstubs = _trim_dataset(results_file, sstubs)
 
-    github = GithubMiner(access_tokens)
+    github = GithubManager(access_tokens)
     build_miner = BuildMiner(github)
     bug_miner = BugMiner(github)
 
@@ -25,14 +25,20 @@ def main():
     counter = 0
     for sstub in sstubs:
         if github.exceeded_request_limit(offset=0.05):
-            github.switch_connection(request_offset=0.5, sleep_offset=2)
+            github.switch_connection(request_offset=0.05, sleep_offset=2)
 
-        build_miner.mine(sstub)
-        bug_miner.mine(sstub)
-        writer.write(sstub.attribute_list())
-
-        counter += 1
-        _update_status(counter, len(sstubs), github.request_status())
+        try:
+            build_miner.mine(sstub)
+            bug_miner.mine(sstub)
+            writer.write(sstub.attribute_list())
+        except KeyboardInterrupt:
+            print("\nExiting program...")
+            return
+        except:
+            print("\nResetting connection...")
+        finally:
+            counter += 1
+            _update_status(counter, len(sstubs), github.request_status())
 
 
 def _load_tokens(tokens_file):
@@ -73,7 +79,7 @@ def _trim_dataset(output_file, sstubs):
 
 def _update_status(counter, total, requests):
     counter += 1
-    print('{}/{} SStuBs Mined ({} requests remaining)'.format(counter, total, requests), end='\r')
+    print('{}/{} SStuBs Mined ({} requests remaining) '.format(counter, total, requests), end='\r')
     if counter == total:
         print()
 
