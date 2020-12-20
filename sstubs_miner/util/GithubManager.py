@@ -48,7 +48,7 @@ class GithubManager:
 
     def exceeded_request_limit(self, offset=0):
         remaining = self._github.get_rate_limit().core.remaining
-        return remaining < (self._limit * offset)
+        return remaining <= (self._limit * offset)
 
     def sleep(self, offset=0):
         reset_time = self._github.get_rate_limit().core.reset

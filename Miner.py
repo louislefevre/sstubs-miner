@@ -1,6 +1,8 @@
 import json
 import os
 import random
+import sys
+
 from sstubs_miner.miners.BugMiner import BugMiner
 from sstubs_miner.miners.BuildMiner import BuildMiner
 from sstubs_miner.util.CSVManager import CSVReader, CSVWriter
@@ -10,35 +12,33 @@ from sstubs_miner.util.SStub import SStub
 
 def main():
     dataset_file = 'data/sstubsLarge-0104.json'
-    results_file = 'results/sstubs.csv'
+    output_file = 'results/sstubs.csv'
     access_tokens = _load_tokens('data/tokens')
 
     sstubs = _load_dataset(dataset_file)
-    if os.path.isfile(results_file):
-        sstubs = _trim_dataset(results_file, sstubs)
+    start_index = _last_entry(output_file) if os.path.isfile(output_file) else 0
+    end_index = len(sstubs)
+    sstubs = sstubs[start_index+1:end_index]
 
     github = GithubManager(access_tokens)
     build_miner = BuildMiner(github)
     bug_miner = BugMiner(github)
 
-    writer = CSVWriter(results_file, SStub.attribute_names())
-    counter = 0
+    writer = CSVWriter(output_file, SStub.attribute_names())
+    counter = start_index
     for sstub in sstubs:
-        if github.exceeded_request_limit(offset=0.05):
-            github.switch_connection(request_offset=0.05, sleep_offset=2)
+        if github.exceeded_request_limit(offset=0.01):
+            github.switch_connection(request_offset=0.01, sleep_offset=1)
+
+        _update_status(counter, end_index, github.request_status())
 
         try:
             build_miner.mine(sstub)
             bug_miner.mine(sstub)
             writer.write(sstub.attribute_list())
-        except KeyboardInterrupt:
-            print("\nExiting program...")
-            return
-        except:
-            print("\nResetting connection...")
-        finally:
             counter += 1
-            _update_status(counter, len(sstubs), github.request_status())
+        except:
+            os.execl(sys.executable, sys.executable, *sys.argv)
 
 
 def _load_tokens(tokens_file):
@@ -69,16 +69,15 @@ def _load_dataset(input_file, randomise=False, size=0):
     return sstubs_list
 
 
-def _trim_dataset(output_file, sstubs):
+def _last_entry(output_file):
     csv_reader = CSVReader(output_file)
     data = csv_reader.read()
     last = data[-1]
-    start_point = int(last['index']) + 1
-    return sstubs[start_point:]
+    last_index = int(last['index'])
+    return last_index
 
 
 def _update_status(counter, total, requests):
-    counter += 1
     print('{}/{} SStuBs Mined ({} requests remaining) '.format(counter, total, requests), end='\r')
     if counter == total:
         print()
