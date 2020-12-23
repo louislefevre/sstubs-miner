@@ -1,4 +1,5 @@
 from statistics import mean
+from math import inf as infinity
 from datetime import datetime, timedelta
 
 
@@ -6,16 +7,6 @@ class DataAnalyser:
     def __init__(self, sstubs):
         self._sstubs = sstubs
         self._builds = self._initialise_builds(sstubs)
-
-    def average_time(self):
-        return self._get_mean_time(self._sstubs)
-
-    def average_build_time(self):
-        build_times = {}
-        for build, sstubs in self._builds.items():
-            mean_time = self._get_mean_time(sstubs)
-            build_times[build] = mean_time
-        return build_times
 
     def sstub_count(self):
         return len(self._sstubs)
@@ -35,6 +26,30 @@ class DataAnalyser:
             projects = self._get_projects(sstubs)
             build_projects[build] = len(projects)
         return build_projects
+
+    def loc_range_count(self):
+        ranges = self._get_loc_ranges(self._sstubs)
+        range_counts = {}
+        for limit, sstubs in ranges.items():
+            range_counts[limit] = len(sstubs)
+        return range_counts
+
+    def average_time(self):
+        return self._get_mean_time(self._sstubs)
+
+    def average_build_time(self):
+        build_times = {}
+        for build, sstubs in self._builds.items():
+            mean_time = self._get_mean_time(sstubs)
+            build_times[build] = mean_time
+        return build_times
+
+    def average_loc_time(self):
+        ranges = self._get_loc_ranges(self._sstubs)
+        range_times = {}
+        for limit, sstubs in ranges.items():
+            range_times[limit] = self._get_mean_time(sstubs)
+        return range_times
 
     def _get_mean_time(self, sstubs):
         time_differences = []
@@ -56,14 +71,25 @@ class DataAnalyser:
         return builds
 
     @staticmethod
-    def _get_time_difference(sstub):
-        bug_date = datetime.strptime(sstub.bug_date, '%Y-%m-%d %H:%M:%S')
-        fix_date = datetime.strptime(sstub.fix_date, '%Y-%m-%d %H:%M:%S')
-        return (fix_date - bug_date).total_seconds()
-
-    @staticmethod
     def _get_projects(sstubs):
         projects = set()
         for sstub in sstubs:
             projects.add(sstub.project_name)
         return projects
+
+    @staticmethod
+    def _get_loc_ranges(sstubs):
+        ranges = {50: [], 100: [], 250: [], 500: [], 1000: [], 2500: [], 5000: [], infinity: []}
+        for sstub in sstubs:
+            loc = int(sstub.loc)
+            for limit in ranges.keys():
+                if loc <= limit:
+                    ranges[limit].append(sstub)
+                    break
+        return ranges
+
+    @staticmethod
+    def _get_time_difference(sstub):
+        bug_date = datetime.strptime(sstub.bug_date, '%Y-%m-%d %H:%M:%S')
+        fix_date = datetime.strptime(sstub.fix_date, '%Y-%m-%d %H:%M:%S')
+        return (fix_date - bug_date).total_seconds()

@@ -16,19 +16,29 @@ def main():
     data_analyser = DataAnalyser(sstubs)
 
     sstubs_count = data_analyser.sstub_count()
-    average_time = data_analyser.average_time()
     project_count = data_analyser.project_count()
+    average_time = data_analyser.average_time()
 
     build_sstubs_count = data_analyser.build_sstub_count()
-    build_average_time = data_analyser.average_build_time()
     build_project_count = data_analyser.build_project_count()
+    build_average_time = data_analyser.average_build_time()
 
-    print("Total SStuBs: {}".format(sstubs_count))
-    print("Average Time: {}".format(average_time))
+    loc_range_count = data_analyser.loc_range_count()
+    loc_range_time = data_analyser.average_loc_time()
+
+    print("\n---General---")
+    print("SStuBs Count: {}".format(sstubs_count))
     print("Project Count: {}".format(project_count))
-    print("Average Build Times: {}".format(build_average_time))
+    print("Average Time: {}".format(average_time))
+
+    print("\n---Builds---")
     print("Build SStuBs Count: {}".format(build_sstubs_count))
     print("Build Project Count: {}".format(build_project_count))
+    print("Build Average Times: {}".format(build_average_time))
+
+    print("\n---LOC---")
+    print("LOC SStuBs Count: {}".format(loc_range_count))
+    print("LOC Average Times: {}".format(loc_range_time))
 
 
 def _load_dataset(sstubs):
