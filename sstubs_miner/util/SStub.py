@@ -29,8 +29,10 @@ class SStub:
 
     @property
     def project_name(self):
-        owner, name = self._project_name.split('.')
-        return owner + "/" + name
+        if '.' in self._project_name:
+            owner, name = self._project_name.split('.')
+            return owner + "/" + name
+        return self._project_name
 
     @property
     def path(self):
