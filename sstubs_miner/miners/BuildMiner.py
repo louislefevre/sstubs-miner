@@ -3,7 +3,8 @@ class BuildMiner:
         self._github = github
         self._projects = {}
         self._builds = ['build.gradle', 'build.gradle.kts',
-                        'pom.xml', 'build.bazel', 'build']
+                        'pom.xml', 'build.bazel', 'build',
+                        'build.xml']
 
     def mine(self, sstub):
         project_name = sstub.project_name
