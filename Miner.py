@@ -39,6 +39,7 @@ def main():
             counter += 1
         except:
             os.execl(sys.executable, sys.executable, *sys.argv)
+    print()
 
 
 def _load_tokens(tokens_file):
