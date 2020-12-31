@@ -1,10 +1,10 @@
 class DataCleaner:
-    def __init__(self):
-        pass
+    def __init__(self, sstubs):
+        self._sstubs = sstubs
 
-    def clean(self, sstubs):
+    def clean(self):
         clean_sstubs = []
-        for sstub in sstubs:
+        for sstub in self._sstubs:
             self._add_missing_build(sstub)
             self._rename_build(sstub)
 

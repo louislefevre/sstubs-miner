@@ -9,20 +9,18 @@ def main():
     output_file = 'results/sstubs.csv'
     reader = CSVReader(output_file)
     sstubs = reader.read()
+
     sstubs = _load_dataset(sstubs)
+    cleaner = DataCleaner(sstubs)
+    sstubs = cleaner.clean()
 
-    cleaner = DataCleaner()
-    sstubs = cleaner.clean(sstubs)
     data_analyser = DataAnalyser(sstubs)
-
     sstubs_count = data_analyser.sstub_count()
     project_count = data_analyser.project_count()
     average_time = data_analyser.average_time()
-
     build_sstubs_count = data_analyser.build_sstub_count()
     build_project_count = data_analyser.build_project_count()
     build_average_time = data_analyser.average_build_time()
-
     loc_range_count = data_analyser.loc_range_count()
     loc_range_time = data_analyser.average_loc_time()
 
