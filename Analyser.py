@@ -1,6 +1,5 @@
 from sstubs_miner.analysers.DataAnalyser import DataAnalyser
 from sstubs_miner.util.CSVManager import CSVReader
-
 from sstubs_miner.util.DataCleaner import DataCleaner
 from sstubs_miner.util.SStub import SStub
 

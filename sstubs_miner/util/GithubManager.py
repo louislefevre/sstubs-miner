@@ -64,7 +64,8 @@ class GithubManager:
 
     def switch_connection(self, request_offset=0, sleep_offset=0):
         highest_remaining = self._get_highest_remaining()
-        if highest_remaining.get_rate_limit().core.remaining > (highest_remaining.get_rate_limit().core.limit * request_offset):
+        if highest_remaining.get_rate_limit().core.remaining > (
+                highest_remaining.get_rate_limit().core.limit * request_offset):
             self._github = highest_remaining
         else:
             self._github = self._get_lowest_reset()

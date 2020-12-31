@@ -1,6 +1,6 @@
-from statistics import mean
-from math import inf as infinity
 from datetime import datetime, timedelta
+from math import inf as infinity
+from statistics import mean
 
 
 class DataAnalyser:
