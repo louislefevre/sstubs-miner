@@ -22,6 +22,7 @@ def main():
     build_average_time = data_analyser.average_build_time()
     loc_range_count = data_analyser.loc_range_count()
     loc_range_time = data_analyser.average_loc_time()
+    project_sstub_count = data_analyser.project_sstub_count()
 
     print("\n---General---")
     print("SStuBs Count: {}".format(sstubs_count))
@@ -36,6 +37,9 @@ def main():
     print("\n---LOC---")
     print("LOC SStuBs Count: {}".format(loc_range_count))
     print("LOC Average Times: {}".format(loc_range_time))
+
+    print("\n---Projects---")
+    print("Project SStuB Count: {}".format(project_sstub_count))
 
 
 def _load_dataset(sstubs):

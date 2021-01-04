@@ -14,6 +14,12 @@ class DataAnalyser:
     def project_count(self):
         return len(self._get_projects(self._sstubs))
 
+    def project_sstub_count(self):
+        projects = dict.fromkeys(self._get_projects(self._sstubs), 0)
+        for sstub in self._sstubs:
+            projects[sstub.project_name] += 1
+        return dict(sorted(projects.items(), key=lambda item: item[1]))
+
     def build_sstub_count(self):
         build_sstubs = {}
         for build, sstubs in self._builds.items():
