@@ -32,4 +32,4 @@ The code can then be executed simply by running *python Miner.py* or *python Ana
 - The code is only designed to retrieve data related to our needs, but is extensible and can be adapted for different data.
 - A single personal access token can only send 5000 requests to GitHub per hour, limiting the rate at which data is mined.
 - Multiple tokens can be placed in the *token* file, and the program will automatically choose the best one throughout execution (based on remaining requests and reset time).
-- Dta mining takes an extremely long time (roughly 1 hour per 800 entries).
+- Data mining takes an extremely long time (roughly 1 hour per 800 entries).
